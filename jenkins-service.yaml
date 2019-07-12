@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins-deployment
+  labels:
+    app: jenkins-deployment
+spec:  
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins-deployment
+    spec:      
+      containers:
+      - image: jenkins/jenkins:alpine
+        imagePullPolicy: Always 
+        name: jenkins-deployment
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 20
+        securityContext: 
+          privileged: true 
+        volumeMounts:
+         - name: jenkins-volume-storage
+           mountPath: "/var/jenkins_home"
+      volumes:
+        - name: jenkins-volume-storage
+          persistentVolumeClaim:
+            claimName: volume-jenkins
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-svs
+spec:
+  ports:
+      # port: is the abstracted Service port,
+      # which can be any port other pods use to access the Service
+    - name: jenkins
+      port: 8080
+      nodePort: 30880
+      targetPort: 8080
+    - name: jenkins-agent
+      port: 50000
+      targetPort: 50000
+  type: LoadBalancer
+  selector:
+    app: jenkins-deployment

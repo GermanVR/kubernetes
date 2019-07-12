@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql-deployment
+spec:  
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql-deployment
+    spec:      
+      containers:
+      - image: mysql:5.7
+        name: mysql-deployment
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: DaSeGeKoEg18
+        - name: MYSQL_DATABASE
+          value: sonar
+        - name: MYSQL_USER
+          value: sonar
+        - name: MYSQL_PASSWORD
+          value: sonar
+        volumeMounts:
+         - name: nfs-volume
+           mountPath: "/var/lib/mysql"
+      volumes:
+        - name: nfs-volume

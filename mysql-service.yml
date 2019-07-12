@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql-deployment
+spec:  
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql-deployment
+    spec:      
+      containers:
+      - image: mysql:5.7
+        name: mysql-deployment
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: DaSeGeKoEg18
+        - name: MYSQL_DATABASE
+          value: sonar
+        - name: MYSQL_USER
+          value: sonar
+        - name: MYSQL_PASSWORD
+          value: sonar
+        volumeMounts:
+         - name: volume-mysql-storage
+           mountPath: "/var/lib/mysql"
+      volumes:
+        - name: volume-mysql-storage
+          persistentVolumeClaim:
+            claimName: volume-mysql
+#          hostPath:
+#            # directory location on host
+#            path: /ic/mysql
+#            # this field is optional
+#            type: Directory
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-sonar
+  labels:
+    name: mysql-sonar
+spec:
+  ports:
+    - name: mysql
+      # port: is the abstracted Service port,
+      # which can be any port other pods use to access the Service
+      port: 3306
+  type: NodePort
+  selector:
+    app: mysql-deployment

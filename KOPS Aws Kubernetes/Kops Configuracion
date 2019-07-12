@@ -1,0 +1,51 @@
+#Crea un Cluster con KOPS
+kops create cluster \
+--name=kops.germanvr.com.mx \
+--state=s3://darqko-kops \
+--zones=eu-central-1a \
+--node-count=2 \
+--node-size=t2.micro \
+--master-size=t2.micro \
+--master-count=1 \
+--dns-zone kZKYW1TFZ85EJH \
+--ssh-public-key=~/.ssh/darqko.pub \
+--dns private
+
+
+export NAME=kops.germanvr.com.mx                                                      
+export KOPS_STATE_STORE=s3://darqko-kops
+kops create cluster --zones=eu-central-1a --name=$NAME --state=s3://darqko-kops --node-count=1 --node-size=t2.micro --master-size=t2.micro --master-count=1 --ssh-public-key=~/.ssh/darqko.pub
+
+
+#Genera proxy para ingresar localmente
+kubectl proxy
+
+#Obtiene la configuracion de Kubectl
+kubectl config view
+
+#Obtiene toda la informacion de todos los namespaces
+kubectl get all --all-namespaces 
+
+#Elimina el cluster
+kops delete cluster --name=kops.germanvr.com.mx --yes
+
+#Obtiene la configuracion de los nodos
+kops edit ig nodes --name=kops.germanvr.com.mx
+
+#Obtiene la configuracion del nodo master
+kops edit ig master --name=kops.germanvr.com.mx
+
+#Obtiene los nodos del cluster
+kops get ig nodes --name=kops.germanvr.com.mx
+
+#Obtiene todos los grupos de instancia
+kops get ig --name=kops.germanvr.com.mx
+
+#Obtiene los cluster
+kops get clusters --name=kops.germanvr.com.mx
+
+#Edita la Configuracion de un cluster
+kops edit ig master-eu-central-1a --name=kops.germanvr.com.mx
+
+#Actualiza el cluster
+kops update cluster --name=kops.germanvr.com.mx --yes

@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sonar-deployment
+  labels:
+    app: sonar-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sonar-deployment
+    spec:
+      containers:
+      - name: sonarqube
+        image: darqko/sonar:latest
+        ports:
+        - name: sonarqube
+          containerPort: 9000
+        env:
+          - name: SONARQUBE_JDBC_USERNAME
+            value: root
+          - name: SONARQUBE_JDBC_PASSWORD
+            value: DaSeGeKoEg18
+          - name: SONARQUBE_JDBC_URL
+            value: jdbc:mysql://mysql-sonar:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true
+#        volumeMounts:
+#          - name: sonarqube-extensions
+#            mountPath: /opt/sonarqube/extensions
+#          - name: sonarqube-data
+#            mountPath: /opt/sonarqube/data
+#        volumes:
+#          - name: sonarqube-extensions
+#            nfs:
+#              server: ""
+#              path: "/sonarqube/extensions"
+#              readOnly: false
+#          - name: sonarqube-data
+#        nfs:
+#          server: ""
+#          path: "/sonarqube/data"
+#          readOnly: false
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonar-svc
+  labels:
+    name: sonar-svc
+spec:
+  ports:
+  - protocol: TCP
+    # port: is the abstracted Service port
+    # which can be any port other pods use to access the Service
+    port: 80
+    # targetPort: is the port the container accepts traffic on
+    targetPort: 9000
+    nodePort: 30900
+  type: LoadBalancer
+  selector:
+    app: sonar-deployment
